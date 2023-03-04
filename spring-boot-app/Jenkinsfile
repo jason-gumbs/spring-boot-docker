@@ -1,0 +1,68 @@
+pipeline {
+
+  environment {
+    PROJECT = "sandbox-io-289003"
+    APP_NAME = "jason-app"
+    FE_SVC_NAME = "${APP_NAME}-frontend"
+    CLUSTER = "jenkins-cd"
+    CLUSTER_ZONE = "us-east1-d"
+    IMAGE_TAG = "gcr.io/${PROJECT}/${APP_NAME}:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
+    JENKINS_CRED = "${PROJECT}"
+  }
+
+  agent {
+    kubernetes {
+      label 'build-deploy-agent'
+      defaultContainer 'jnlp'
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+labels:
+  component: ci
+spec:
+  # Use service account that can deploy to all namespaces
+  serviceAccountName: cd-jenkins
+  containers:
+  - name:  maven
+    image:  maven
+    imagePullPolicy: IfNotPresent
+    command:
+    - cat
+    tty: true
+  - name: gcloud
+    image: google/cloud-sdk:slim
+    imagePullPolicy: IfNotPresent
+    command:
+    - cat
+    tty: true
+  - name: kubectl
+    image: gcr.io/sandbox-io-289003/springbootapp:master.57/kubectl
+    imagePullPolicy: IfNotPresent
+    command:
+    - cat
+    tty: true
+"""
+}
+  }
+  stages {
+    stage('Compilation') {
+       steps {
+        container('maven') {
+         dir("spring-boot-app") {
+          sh "./mvnw clean install -DskipTests"
+          }
+        }
+      }
+    }
+    stage('Build and push image with Container Builder') {
+      steps {
+        container('gcloud') {
+          dir("spring-boot-app") {
+          sh "PYTHONUNBUFFERED=1 gcloud builds submit -t ${IMAGE_TAG} ."
+         }
+        }
+      }
+    }
+  }
+}

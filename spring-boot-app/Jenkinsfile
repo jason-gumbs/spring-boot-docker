@@ -51,6 +51,7 @@ spec:
         container('maven') {
          dir("spring-boot-app") {
           sh "mvn clean install -DskipTests"
+          stash includes: 'target/spring-boot-docker.jar', name: 'builtSources' 
           }
         }
       }
@@ -59,6 +60,7 @@ spec:
       steps {
         container('gcloud') {
           dir("spring-boot-app") {
+          unstash 'builtSources'
           sh "PYTHONUNBUFFERED=1 gcloud builds submit -t ${IMAGE_TAG} ."
          }
         }

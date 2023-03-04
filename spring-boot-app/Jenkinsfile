@@ -60,7 +60,7 @@ spec:
       steps {
         container('gcloud') {
           dir("spring-boot-app") {
-          unstash 'builtSources'
+          sh "ls"
           sh "PYTHONUNBUFFERED=1 gcloud builds submit -t ${IMAGE_TAG} ."
          }
         }

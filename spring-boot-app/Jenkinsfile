@@ -51,7 +51,6 @@ spec:
         container('maven') {
          dir("spring-boot-app") {
           sh "mvn clean install -DskipTests"
-          stash includes: 'target/spring-boot-docker.jar', name: 'builtSources' 
           }
         }
       }
@@ -60,7 +59,7 @@ spec:
       steps {
         container('kaniko') {
           dir("spring-boot-app") {
-        sh "/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=${IMAGE_TAG}"
+           sh "/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=${IMAGE_TAG}"
          }
         }
       }

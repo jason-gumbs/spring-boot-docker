@@ -55,7 +55,7 @@ spec:
         }
       }
     }
-    stage('Build and push image with Container Builder') {
+    stage('Build and push image with Kaniko') {
       steps {
         container('kaniko') {
           dir("spring-boot-app") {

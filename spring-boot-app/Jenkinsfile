@@ -30,12 +30,6 @@ spec:
     command:
     - cat
     tty: true
-  - name: gcloud
-    image: google/cloud-sdk:slim
-    imagePullPolicy: IfNotPresent
-    command:
-    - cat
-    tty: true
   - name: kubectl
     image: bitnami/kubectl:latest
     imagePullPolicy: IfNotPresent

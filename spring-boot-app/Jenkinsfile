@@ -1,5 +1,5 @@
 pipeline {
-
+  triggers { pollSCM('* * * * * ') }
   environment {
     PROJECT = "sandbox-io-289003"
     APP_NAME = "jason-app"

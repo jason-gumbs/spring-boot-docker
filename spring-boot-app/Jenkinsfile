@@ -72,6 +72,7 @@ spec:
           dir("spring-boot-app") {
             // No access to docker deamon so kaniko is the best option to build docker within kubernetes jenkins agent
             // The equivilant to docker build, tag and push
+           sh "ls"
            sh "kubectl apply -f deployment.yaml"
          }
         }

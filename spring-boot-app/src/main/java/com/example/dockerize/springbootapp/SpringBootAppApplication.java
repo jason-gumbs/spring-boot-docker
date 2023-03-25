@@ -1,11 +1,14 @@
-package com.example.demo;
+package com.example.dockerize.springbootapp;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 @RestController
-public class HelloController {
+
+
+public class SpringBootAppApplication {
 
     @Value("${YOUR_NAME}")
     private String yourName;

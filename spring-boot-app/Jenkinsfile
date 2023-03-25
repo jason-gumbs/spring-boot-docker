@@ -70,9 +70,14 @@ spec:
       steps {
         container('kubectl') {
           dir("spring-boot-app") {
+            if ("${env.BRANCH_NAME}" == "master"){
+               sh "helm template  jason ./jason-spring-chart/ --set image.tag=${env.BRANCH_NAME}.${env.BUILD_NUMBER} | kubectl apply -f - "
+            }
+            else{
             sh "helm template  jason ./jason-spring-chart/ --set image.tag=${env.BRANCH_NAME}.${env.BUILD_NUMBER} | kubectl apply -f - "
           //  sh "kubectl apply -f deployment.yaml"
          }
+          }
         }
       }
     }

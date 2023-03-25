@@ -60,7 +60,7 @@ spec:
         container('kaniko') {
           dir("spring-boot-app") {
             // No access to docker deamon so kaniko is the best option to build docker within kubernetes jenkins agent
-            // The equivilant to docker build, tag and push
+            // The equivilant to docker build, tag and push.
            sh "/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=${IMAGE_TAG}"
          }
         }

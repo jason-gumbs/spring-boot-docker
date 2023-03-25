@@ -1,6 +1,5 @@
 package com.example.dockerize.springbootapp;
 
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,5 +23,4 @@ public class SpringBootAppApplication {
 	public String getGreeting(){
 		return "Hello " + yourName;
 	}
-
 }

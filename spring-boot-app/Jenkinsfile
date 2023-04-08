@@ -96,6 +96,7 @@ spec:
             git config --global user.name "jgumbs"
             git config --global user.email "wilfred.smithandsmith@gmail.com"
             git config --global user.password "$TOKEN"
+            git config --global --add safe.directory '*'
             LAST_LOG=$(git log --format='%H' --max-count=1 origin/master)
             echo "LAST_LOG:$LAST_LOG"
             LAST_MERGE=$(git log --format='%H' --merges --max-count=1 origin/master)

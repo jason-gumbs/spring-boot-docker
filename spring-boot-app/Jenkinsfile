@@ -93,6 +93,9 @@ spec:
         container('git') {
         withCredentials([string(credentialsId: 'jason-text', variable: 'TOKEN')]) {
           sh '''#!/bin/bash
+            git config --global user.name "jgumbs"
+            git config --global user.email "wilfred.smithandsmith@gmail.com"
+            git config --global user.password "$TOKEN"
             LAST_LOG=$(git log --format='%H' --max-count=1 origin/master)
             echo "LAST_LOG:$LAST_LOG"
             LAST_MERGE=$(git log --format='%H' --merges --max-count=1 origin/master)

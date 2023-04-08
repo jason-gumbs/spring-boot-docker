@@ -116,7 +116,7 @@ spec:
                     "draft": false,
                     "prerelease": false
                 }'
-                curl -H 'Authorization: token $TOKEN'--data "$DATA" "https://api.github.com/repos/$REPO/releases"
+                curl --header "Accept: application/vnd.github+json" --header "Authorization: Bearer $TOKEN" --data "$DATA" "https://api.github.com/repos/$REPO/releases"
             fi
             '''
   }

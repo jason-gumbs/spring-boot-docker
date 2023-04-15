@@ -5,13 +5,13 @@
 replicaCount: 1
 
 image:
-  repository: gcr.io/sandbox-io-289003/jason-app
+  repository: gcr.io/sandbox-io-289003/datateam
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "master.17"
 
 app:
-  labels: "jason-springboot-app"
+  labels: "mandatory-label"
   name: "jason-helm-map"
 
 imagePullSecrets: []

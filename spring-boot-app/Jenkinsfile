@@ -1,3 +1,4 @@
+def release_version
 pipeline {
   environment {
     PROJECT = "sandbox-io-289003"
@@ -37,7 +38,7 @@ spec:
     - cat
     tty: true
   - name: git
-    image: bitnami/git:2.40.0
+    image: jlrigau/maven-git
     imagePullPolicy: IfNotPresent
     command:
     - cat
@@ -52,47 +53,29 @@ spec:
 """
 }
   }
+  
   stages {
-    // stage('Compilation') {
-    //    steps {
-    //     container('maven') {
-    //      dir("spring-boot-app") {
-    //       sh "mvn clean install -DskipTests"
-    //       }
-    //     }
-    //   }
-    // }
-    // stage('Build and push image with Google Container Registry') {
-    //   steps {
-    //     container('kaniko') {
-    //       dir("spring-boot-app") {
-    //         // No access to docker deamon so kaniko is the best option to build docker within kubernetes jenkins agent
-    //         // The equivilant to docker build, tag and push.
-    //        sh "/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=${IMAGE_TAG}"
-    //      }
-    //     }
-    //   }
-    // }
-    // stage('Deploy to kubernetes') {
-    //   steps {
-    //     container('kubectl') {
-    //       dir("spring-boot-app") {
-    //         if ("${env.BRANCH_NAME}" == "master"){
-    //            sh "helm template  jason ./jason-spring-chart/ --set image.tag=${env.BRANCH_NAME}.${env.BUILD_NUMBER} | kubectl apply -f - "
-    //         }
-    //         else{
-    //         sh "helm template  jason ./jason-spring-chart/ --set image.tag=${env.BRANCH_NAME}.${env.BUILD_NUMBER} | kubectl apply -f - "
-    //       //  sh "kubectl apply -f deployment.yaml"
-    //      }
-    //       }
-    //     }
-    //   }
-    // }
-     stage('Release') {
+    
+    stage('Release') {
+      when {
+                branch 'master'
+            }
       steps {
         container('git') {
-        withCredentials([string(credentialsId: 'github-token ', variable: 'TOKEN')]) {
+        withCredentials([string(credentialsId: 'jason-text', variable: 'TOKEN')]) {
+          script {
+           
+        release_version  = sh (
+                script: "git log --format='%s' --max-count=1 origin/master | grep --only-matching 'v\\?[0-9]\\+\\.[0-9]\\+\\(\\.[0-9]\\+\\)\\?'",
+                 returnStdout: true
+                   ).trim()
+          }
+     
           sh '''#!/bin/bash
+            git config --global user.name "jgumbs"
+            git config --global user.email "wilfred.smithandsmith@gmail.com"
+            git config --global user.password "$TOKEN"
+            git config --global --add safe.directory '*'
             LAST_LOG=$(git log --format='%H' --max-count=1 origin/master)
             echo "LAST_LOG:$LAST_LOG"
             LAST_MERGE=$(git log --format='%H' --merges --max-count=1 origin/master)
@@ -101,6 +84,7 @@ spec:
             echo "LAST_MSG:$LAST_MSG"
             VERSION=$(echo $LAST_MSG | grep --only-matching 'v\\?[0-9]\\+\\.[0-9]\\+\\(\\.[0-9]\\+\\)\\?')
             echo "VERSION:$VERSION"
+            "${my_var}=version
             
             if [[ $LAST_LOG == $LAST_MERGE && -n $VERSION ]]
             then
@@ -112,12 +96,53 @@ spec:
                     "draft": false,
                     "prerelease": false
                 }'
-                curl -H 'Authorization: token $TOKEN'--data "$DATA" "https://api.github.com/repos/$REPO/releases"
+                curl --header "Accept: application/vnd.github+json" --header "Authorization: Bearer $TOKEN" --data "$DATA" "https://api.github.com/repos/$REPO/releases"
             fi
+
+            mvn  versions:set -DnewVersion=$VERSION
+            mvn install -DskipTests
             '''
-  }
+  
         }
 }
      }
+    }
+  
+    stage('Compilation') {
+       when {
+              expression { env.BRANCH_NAME != "master" }
+            }
+       steps {
+        container('maven') {
+         dir("spring-boot-app") {
+          sh "mvn clean install -DskipTests"
+          }
+        }
+      }
+    }
+    
+    stage('Build and push image with Google Container Registry') {
+      steps {
+        container('kaniko') {
+          dir("spring-boot-app") {
+            // No access to docker deamon so kaniko is the best option to build docker within kubernetes jenkins agent
+            // The equivilant to docker build, tag and push.
+           sh "/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=${release_version}"
+         }
+        }
+      }
+    }
+    stage('Deploy to kubernetes') {
+      steps {
+        container('kubectl') {
+          dir("spring-boot-app") {
+           
+               sh "helm template  jason ./jason-spring-chart/ --set image.tag=${release_version} | kubectl apply -f - "
+          
+         
+          }
+        }
+      }
+    }
   }
 }

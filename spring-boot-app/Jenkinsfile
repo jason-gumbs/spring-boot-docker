@@ -60,7 +60,7 @@ spec:
         container('git') {
         withCredentials([string(credentialsId: 'jason-text', variable: 'TOKEN')]) {
           LAST_MSG = sh (
-                script: 'git log --format='%s' --max-count=1 origin/master',
+                script: "git log --format='%s' --max-count=1 origin/master",
                  returnStdout: true
                    ).trim()
           release_version  = sh (

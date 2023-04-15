@@ -70,7 +70,6 @@ spec:
                  returnStdout: true
                    ).trim()
           }
-     
           sh '''#!/bin/bash
             git config --global user.name "jgumbs"
             git config --global user.email "wilfred.smithandsmith@gmail.com"

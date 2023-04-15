@@ -98,8 +98,6 @@ spec:
                 curl --header "Accept: application/vnd.github+json" --header "Authorization: Bearer $TOKEN" --data "$DATA" "https://api.github.com/repos/$REPO/releases"
             fi
 
-            mvn  versions:set -DnewVersion=$VERSION
-            mvn install -DskipTests
             '''
   
         }
@@ -108,12 +106,11 @@ spec:
     }
   
     stage('Compilation') {
-       when {
-              expression { env.BRANCH_NAME != "master" }
-            }
+
        steps {
         container('maven') {
          dir("spring-boot-app") {
+             sh "mvn  versions:set -DnewVersion=${release_version}"
           sh "mvn clean install -DskipTests"
           }
         }
@@ -126,7 +123,7 @@ spec:
           dir("spring-boot-app") {
             // No access to docker deamon so kaniko is the best option to build docker within kubernetes jenkins agent
             // The equivilant to docker build, tag and push.
-           sh "/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=${release_version}"
+           sh "/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=gcr.io/${PROJECT}/${APP_NAME}:${release_version}"
          }
         }
       }

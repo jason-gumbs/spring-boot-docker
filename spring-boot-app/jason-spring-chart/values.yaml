@@ -11,7 +11,7 @@ image:
   tag: "master.17"
 
 app:
-  labels: "mandatory-label"
+  labels: "jason-springboot-app"
   name: "jason-helm-map"
 
 imagePullSecrets: []

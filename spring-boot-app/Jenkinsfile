@@ -53,10 +53,13 @@ spec:
 """
 }
   }
-  if (env.BRANCH_NAME == "master"){
+  
   stages {
     
     stage('Release') {
+      when {
+                branch 'master'
+            }
       steps {
         container('git') {
         withCredentials([string(credentialsId: 'jason-text', variable: 'TOKEN')]) {
@@ -99,13 +102,16 @@ spec:
             mvn  versions:set -DnewVersion=$VERSION
             mvn install -DskipTests
             '''
-  }
+  
         }
 }
      }
     }
-    else{
+  
     stage('Compilation') {
+       when {
+              expression { env.BRANCH_NAME != "master" }
+            }
        steps {
         container('maven') {
          dir("spring-boot-app") {
@@ -114,7 +120,7 @@ spec:
         }
       }
     }
-    }
+    
     stage('Build and push image with Google Container Registry') {
       steps {
         container('kaniko') {

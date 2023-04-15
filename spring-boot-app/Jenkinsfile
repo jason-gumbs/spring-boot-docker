@@ -64,13 +64,13 @@ spec:
         container('git') {
         withCredentials([string(credentialsId: 'jason-text', variable: 'TOKEN')]) {
           script {
-          def LAST_MSG = sh (
-                script: "git log --format='%s' --max-count=1 origin/master",
-                 returnStdout: true).trim()
-          release_version  = sh (
-                script: "echo ${LAST_MSG} | grep --only-matching 'v\\?[0-9]\\+\\.[0-9]\\+\\(\\.[0-9]\\+\\)\\?'",
+           
+        release_version  = sh (
+                script: "git log --format='%s' --max-count=1 origin/master | grep --only-matching 'v\\?[0-9]\\+\\.[0-9]\\+\\(\\.[0-9]\\+\\)\\?'",
                  returnStdout: true
                    ).trim()
+
+                   println release_version
           }
      
           sh '''#!/bin/bash

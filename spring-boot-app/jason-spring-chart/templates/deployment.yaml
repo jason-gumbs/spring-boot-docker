@@ -23,7 +23,7 @@ spec:
         readinessProbe:
           failureThreshold: 3
           httpGet:
-            path: /api/hello
+            path: /jason/api/hello
             port: http
             scheme: HTTP
           initialDelaySeconds: 10

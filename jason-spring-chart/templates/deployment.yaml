@@ -19,6 +19,17 @@ spec:
         image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
         ports:
         - containerPort: {{ .Values.service.port }}
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /jason/api/hello
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
         env:
         - name: YOUR_NAME
           valueFrom:

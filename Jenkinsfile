@@ -1,4 +1,4 @@
-def release_version
+def release_version = env.BUILD_NUMBER
 pipeline {
   environment {
     PROJECT = "sandbox-io-289003"
@@ -64,7 +64,7 @@ spec:
         container('git') {
         withCredentials([string(credentialsId: 'jason-text', variable: 'TOKEN')]) {
           script {
-           
+         
         release_version  = sh (
                 script: "git log --format='%s' --max-count=1 origin/master | grep --only-matching 'v\\?[0-9]\\+\\.[0-9]\\+\\(\\.[0-9]\\+\\)\\?'",
                  returnStdout: true
@@ -106,12 +106,12 @@ spec:
     }
   
     stage('Compilation') {
-
+ 
        steps {
         container('maven') {
          dir("spring-boot-app") {
              sh "mvn  versions:set -DnewVersion=${release_version}"
-          sh "mvn clean install -DskipTests"
+             sh "mvn clean install -DskipTests"
           }
         }
       }
@@ -121,8 +121,6 @@ spec:
       steps {
         container('kaniko') {
           dir("spring-boot-app") {
-            // No access to docker deamon so kaniko is the best option to build docker within kubernetes jenkins agent
-            // The equivilant to docker build, tag and push.
            sh "/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=gcr.io/${PROJECT}/${APP_NAME}:${release_version}"
          }
         }

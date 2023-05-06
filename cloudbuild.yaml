@@ -21,8 +21,11 @@ steps:
     args: ["package", "-Dmaven.test.skip=true"]
   - name: gcr.io/cloud-builders/docker
     args: ["build", "-t", "gcr.io/$PROJECT_ID/$_REPO_NAME:$SHORT_SHA",  "."]
-  - name: 'dtzar/helm-kubectl:3.11'
-    args: ['template', 'jason', './jason-spring-chart/', '--set', 'image.tag=$SHORT_SHA', '>', 'k8.yaml']
+  - name: 'gcr.io/$PROJECT_ID/helm'
+    # args: ['template', 'jason', './jason-spring-chart/', '--set', 'image.tag=$SHORT_SHA', '>', 'k8.yaml']
+    script: |
+      #!/usr/bin/env bash
+      helm template  jason ./jason-spring-chart/ --set image.tag=apple > k8.yaml
     env:
     - 'CLOUDSDK_COMPUTE_ZONE=us-east1-d'
     - 'CLOUDSDK_CONTAINER_CLUSTER=jenkins-cd'

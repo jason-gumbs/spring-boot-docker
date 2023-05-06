@@ -16,16 +16,15 @@ steps:
   # - name: maven:3-eclipse-temurin-17-alpine
   #   entrypoint: mvn
   #   args: ["test"]
-  - name: maven:3-eclipse-temurin-17-alpine
-    entrypoint: mvn
-    args: ["package", "-Dmaven.test.skip=true"]
-  - name: gcr.io/cloud-builders/docker
-    args: ["build", "-t", "gcr.io/$PROJECT_ID/$_REPO_NAME:$SHORT_SHA",  "."]
+  # - name: maven:3-eclipse-temurin-17-alpine
+  #   entrypoint: mvn
+  #   args: ["package", "-Dmaven.test.skip=true"]
+  # - name: gcr.io/cloud-builders/docker
+  #   args: ["build", "-t", "gcr.io/$PROJECT_ID/$_REPO_NAME:$SHORT_SHA",  "."]
   - name: 'gcr.io/$PROJECT_ID/helm'
     # args: ['template', 'jason', './jason-spring-chart/', '--set', 'image.tag=$SHORT_SHA', '>', 'k8.yaml']
-    script: |
-      #!/usr/bin/env bash
-      helm template  jason ./jason-spring-chart/ --set image.tag=apple > k8.yaml
+    entrypoint: 'bash'
+    args: ['./test.sh']
     env:
     - 'CLOUDSDK_COMPUTE_ZONE=us-east1-d'
     - 'CLOUDSDK_CONTAINER_CLUSTER=jenkins-cd'

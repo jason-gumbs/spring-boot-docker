@@ -13,7 +13,6 @@
 # limitations under the License.
 # [START cloudbuild_maven]
 steps:
-
   - name: maven:3-eclipse-temurin-17-alpine
     entrypoint: mvn
     args: ["package", "-Dmaven.test.skip=true"]
@@ -23,7 +22,7 @@ steps:
     args: ["push", "gcr.io/$PROJECT_ID/$_REPO_NAME:$SHORT_SHA"]
   - name: 'gcr.io/$PROJECT_ID/helm'
     entrypoint: 'bash'
-    args: ['./test.sh']
+    args: ['./test.sh', "$SHORT_SHA"]
     env:
     - 'CLOUDSDK_COMPUTE_ZONE=us-east1-d'
     - 'CLOUDSDK_CONTAINER_CLUSTER=jenkins-cd'

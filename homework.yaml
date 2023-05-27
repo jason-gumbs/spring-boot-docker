@@ -24,7 +24,7 @@ steps:
       - ns
       - kazre-stages
       - "||"
-      - true
+      - "true"
   - name: gcr.io/cloud-builders/kubectl
     env:
       - CLOUDSDK_COMPUTE_ZONE=us-east1-d

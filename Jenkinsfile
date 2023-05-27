@@ -1,4 +1,7 @@
 def release_version = env.BUILD_NUMBER
+def print_full_name(first, last){
+  
+}
 pipeline {
   environment {
     PROJECT = "sandbox-io-289003"
@@ -112,6 +115,7 @@ spec:
          dir("spring-boot-app") {
              sh "mvn  versions:set -DnewVersion=${release_version}"
              sh "mvn clean install -DskipTests"
+             sh "echo Hello "+ first +" "+ last+ "! You just delved into python."
           }
         }
       }
